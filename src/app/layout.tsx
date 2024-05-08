@@ -18,12 +18,12 @@ export default function RootLayout({
     return (
         <html lang="en">
         <body className={inter.className}>
-        <div className={"text-zinc-50 min-h-screen"}>
+        <div className={"text-zinc-50 min-h-screen flex flex-col justify-between"}>
             <header>
-                <nav className="flex bg-gradient-to-r from-emerald-700 to-green-900">
+                <nav className="flex bg-gray-800">
                     <div className="flex items-center p-2">
                         <div className="font-bold text-2xl ml-0.5">
-                            PI<span className="text-black">AIC</span>
+                            PI<span className="text-gray-500">AIC</span>
                         </div>
                     </div>
 
@@ -57,6 +57,9 @@ export default function RootLayout({
             <main className={"flex flex-col items-center justify-center p-24"}>
                 {children}
             </main>
+            <footer className={"bg-gray-800 p-4 text-center"}>
+                Created by <Link href={"https://hassanrazanet"}>Hassan Raza</Link>
+            </footer>
         </div>
         </body>
         </html>
