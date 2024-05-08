@@ -18,11 +18,10 @@ export default function RootLayout({
     return (
         <html lang="en">
         <body className={inter.className}>
-        <div className={"text-zinc-50"}>
+        <div className={"text-zinc-50 min-h-screen"}>
             <header>
                 <nav className="flex bg-gradient-to-r from-emerald-700 to-green-900">
                     <div className="flex items-center p-2">
-                        <img src="assets/images/logo-new.webp" className="w-12" alt="Logo"/>
                         <div className="font-bold text-2xl ml-0.5">
                             PI<span className="text-black">AIC</span>
                         </div>
@@ -55,7 +54,7 @@ export default function RootLayout({
                     </div>
                 </nav>
             </header>
-            <main className={"flex min-h-screen flex-col items-center justify-center p-24"}>
+            <main className={"flex flex-col items-center justify-center p-24"}>
                 {children}
             </main>
         </div>
