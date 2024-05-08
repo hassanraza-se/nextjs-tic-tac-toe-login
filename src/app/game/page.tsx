@@ -10,6 +10,7 @@ function Game() {
     const player2 = "O";
 
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
+    const [isDraw, setIsDraw] = useState<boolean>(false);
     const [winner, setWinner] = useState<string | null>(null);
     const [winnerCombination, setWinnerCombination] = useState<number[]>([]);
 
@@ -50,6 +51,11 @@ function Game() {
      * every click in cell/ board history update
      */
     useEffect(() => {
+        if (Object.keys(boardHistory).length === Object.keys(squares).length && !winner) {
+            setIsDraw(true);
+            setIsPlaying(false);
+        }
+
         if (Object.keys(boardHistory).length > 0) {
             for (const combination of winningCombinations) {
                 const [a, b, c] = combination;
@@ -107,6 +113,7 @@ function Game() {
         setCurrentPlayer(player1);
         setWinner(null);
         setWinnerCombination([]);
+        setIsDraw(false);
     }
 
     return (
@@ -119,6 +126,8 @@ function Game() {
                 />
                 <audio src={"/crowd-cheering.mp3"} autoPlay={true} className={"hidden"} />
             </>}
+
+            {isDraw && <audio src={"/game-over.mp3"} autoPlay={true} className={"hidden"} />}
 
             <div className={"flex text-gray-800"}>
                 <div className={"flex-auto w-1/2"}>
@@ -135,9 +144,16 @@ function Game() {
                     </div>
                 </div>
                 <div className={"flex-auto w-1/2 px-6"}>
-                    {(!isPlaying && !winner) && <div className={"flex flex-col justify-center items-center h-full"}>
+                    {(!isPlaying && !winner && !isDraw) && <div className={"flex flex-col justify-center items-center h-full"}>
                         <h2 className={"text-2xl mb-3 text-center"}>Click Start to Play</h2>
                         <PrimaryButton className={"w-20"} onClick={() => {startPlaying(true)}}>Start</PrimaryButton>
+                    </div>}
+
+                    {(!isPlaying && isDraw) && <div className={"flex flex-col justify-center h-full "}>
+                        <div className={"text-2xl text-center"}>
+                            Match Drawn
+                        </div>
+                        <PrimaryButton className={"w-36 mx-auto mt-3 "} onClick={startOver}>Start Again</PrimaryButton>
                     </div>}
 
                     {(!isPlaying && winner) && <div className={"flex flex-col justify-center h-full "}>
