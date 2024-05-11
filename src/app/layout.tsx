@@ -54,7 +54,7 @@ export default function RootLayout({
                     </div>
                 </nav>
             </header>
-            <main className={"flex flex-col items-center justify-center p-24"}>
+            <main className={"flex flex-col items-center justify-center lg:p-24 md:p-16 sm:p-4"}>
                 {children}
             </main>
             <footer className={"bg-gray-800 p-4 text-center"}>

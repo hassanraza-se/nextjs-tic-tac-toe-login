@@ -39,9 +39,9 @@ function Login() {
     }
 
     return (
-        <Card className={"w-2/3"}>
+        <Card className={"lg:w-2/3 md:w-4/5 w-5/6"}>
             <div className={"flex w-full"}>
-                <div className={"flex-auto w-1/2 bg-green-500"}>
+                <div className={"flex-auto w-1/2 bg-green-500 hidden md:block"}>
                     <Image width={400} height={400} className={"h-full w-full object-cover"} src={"https://images.unsplash.com/photo-1598908314766-3e3ce9bd2f48?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"} alt={"Side Banner"} />
                 </div>
                 <div className={"flex-auto w-1/2 px-6 py-7"}>

@@ -4,6 +4,7 @@ import Card from "@/components/Card";
 import BoardCell from "@/app/game/BoardCell";
 import PrimaryButton from "@/components/PrimaryButton";
 import ReactConfetti from 'react-confetti'
+import {number} from "prop-types";
 
 function Game() {
     const player1 = "X";
@@ -14,26 +15,21 @@ function Game() {
     const [winner, setWinner] = useState<string | null>(null);
     const [winnerCombination, setWinnerCombination] = useState<number[]>([]);
 
-
-    type CellValue = string | null
-    type SquareType = {
-        [index: number]: CellValue;
-    };
-
-    const squaresInitials: SquareType= {
-        0: null,
-        1: null,
-        2: null,
-        3: null,
-        4: null,
-        5: null,
-        6: null,
-        7: null,
-        8: null,
-    };
-    const [squares, setSquares] = useState<SquareType>(squaresInitials);
+    const squaresInitials: (string | null)[] = [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+    ];
+    const [squares, setSquares] = useState(squaresInitials);
     const [currentPlayer, setCurrentPlayer] = useState(player1);
-    const [boardHistory, setBoardHistory] = useState<SquareType>({});
+    const [boardHistory, setBoardHistory] = useState([squaresInitials]);
+
 
     const winningCombinations = [
         [0, 1, 2],
@@ -51,27 +47,27 @@ function Game() {
      * every click in cell/ board history update
      */
     useEffect(() => {
-        if (Object.keys(boardHistory).length === Object.keys(squares).length && !winner) {
+        if (squares.every(x => x !== null)) {
             setIsDraw(true);
             setIsPlaying(false);
         }
 
-        if (Object.keys(boardHistory).length > 0) {
+        if (squares.length > 0) {
             for (const combination of winningCombinations) {
                 const [a, b, c] = combination;
 
                 if (
-                    boardHistory[a] !== undefined &&
-                    boardHistory[a] === boardHistory[b] &&
-                    boardHistory[a] === boardHistory[c]
+                    squares[a] &&
+                    squares[a] === squares[b] &&
+                    squares[a] === squares[c]
                 ) {
                     setWinnerCombination(combination);
                     setIsPlaying(false);
-                    setWinner(boardHistory[a]);
+                    setWinner(squares[a]);
                 }
             }
         }
-    }, [boardHistory])
+    }, [squares])
 
     /**
      * Click handler for board cell
@@ -79,15 +75,13 @@ function Game() {
      */
     const boardCellClickHandler = (index: number) => {
         if (isPlaying && squares[index] === null) {
-            setSquares(prevState => ({
-                ...prevState,
-                [index]: currentPlayer
-            }));
 
-            setBoardHistory(prevState => ({
-                ...prevState,
-                [index]: currentPlayer
-            }))
+            let newHistory = boardHistory.slice(0, squares.filter(x => x !== null).length + 1);
+
+            const newSquares = squares.map((value, i) => (i === index ? currentPlayer : value));
+
+            setSquares(newSquares);
+            setBoardHistory(prevHistory => [...newHistory, newSquares]);
             setCurrentPlayer(currentPlayer == player1 ? player2 : player1);
         }
     }
@@ -108,7 +102,7 @@ function Game() {
      */
     const startOver = () => {
         startPlaying(false);
-        setBoardHistory({});
+        setBoardHistory([squaresInitials]);
         setSquares(squaresInitials);
         setCurrentPlayer(player1);
         setWinner(null);
@@ -116,8 +110,13 @@ function Game() {
         setIsDraw(false);
     }
 
+    const timeTravel = (index: number) => {
+        setSquares(boardHistory[index])
+        setCurrentPlayer(index % 2 ? 'O' : 'X');
+    }
+
     return (
-        <Card className={"w-2/3 p-4"}>
+        <Card className={"lg:w-2/3 md:w-4/5 w-5/6"}>
 
             {winner && <>
                 <ReactConfetti
@@ -129,8 +128,8 @@ function Game() {
 
             {isDraw && <audio src={"/game-over.mp3"} autoPlay={true} className={"hidden"} />}
 
-            <div className={"flex text-gray-800"}>
-                <div className={"flex-auto w-1/2"}>
+            <div className={"flex flex-wrap text-gray-800"}>
+                <div className={"flex-auto lg:w-1/2 md:w-2/3 sm:w-full p-4"}>
                     <h2 className={"text-2xl mb-3 text-center"}>Tic-Tac-Toe Board</h2>
 
                     <div className={"flex flex-wrap"}>
@@ -143,7 +142,7 @@ function Game() {
                         })}
                     </div>
                 </div>
-                <div className={"flex-auto w-1/2 px-6"}>
+                <div className={"flex-auto lg:w-1/2 md:w-1/3 sm:w-full p-4"}>
                     {(!isPlaying && !winner && !isDraw) && <div className={"flex flex-col justify-center items-center h-full"}>
                         <h2 className={"text-2xl mb-3 text-center"}>Click Start to Play</h2>
                         <PrimaryButton className={"w-20"} onClick={() => {startPlaying(true)}}>Start</PrimaryButton>
@@ -163,20 +162,19 @@ function Game() {
                         <PrimaryButton className={"w-36 mx-auto " + (!winner ? "mt-auto" : "mt-3")} onClick={startOver}>Start Over</PrimaryButton>
                     </div>}
 
-                    {isPlaying && <div className={"flex flex-col justify-center h-full " + (winner && "items-center")}>
+                    {isPlaying && <div className={"flex flex-col justify-start ps-4 h-full " + (winner && "items-center")}>
                         <h2 className={"text-2xl mb-3 text-center"}>Let&apos;s Play</h2>
                         <div className={"text-2xl"}>{currentPlayer}&apos;s Turn</div>
-                        <div>
-                            {Object.keys(boardHistory).map((value, index) => {
-                                return <div key={index}>{value} =&gt; {boardHistory[index]} </div>
+                        <ol className={"list-decimal"}>
+                            {boardHistory.map((value, index) => {
+                                return <li key={index}>
+                                    <PrimaryButton className={"mb-2 "} onClick={() => {
+                                        timeTravel(index)
+                                    }}>{index > 0 ? "Go to Move# " + index : 'Start Over'}</PrimaryButton>
+                                </li>
+
                             })}
-                        </div>
-                        <PrimaryButton
-                            className={"w-36 mx-auto " + (!winner ? "mt-auto" : "mt-3")}
-                            onClick={startOver}
-                        >Start
-                            Over
-                        </PrimaryButton>
+                        </ol>
                     </div>}
                 </div>
             </div>
